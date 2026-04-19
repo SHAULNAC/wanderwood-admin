@@ -125,7 +125,8 @@
         const state = {
             products: [],
             currentImageUrls: [],
-            editing: false
+            editing: false,
+            backendMode: 'full'
         };
 
         const el = {
@@ -182,6 +183,16 @@
 
             el.status.innerText = message;
             el.status.className = `mt-4 p-3 rounded-xl text-center font-bold block ${styles[type] || styles.info}`;
+        }
+
+        function setProductsError(message, details = '') {
+            el.productsList.innerHTML = `
+                <div class="text-right text-amber-900 py-4 px-4 border border-amber-200 rounded-xl bg-amber-50 space-y-2">
+                    <p class="font-bold">לא ניתן לטעון מוצרים מהסקריפט הנוכחי.</p>
+                    <p class="text-sm">${message}</p>
+                    ${details ? `<pre class="text-xs bg-white border border-amber-200 rounded p-2 overflow-auto whitespace-pre-wrap">${details}</pre>` : ''}
+                </div>
+            `;
         }
 
         function setLoading(loading, text = 'טוען...') {
@@ -282,12 +293,17 @@
                 const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=list`, { method: 'GET' });
                 const payload = await res.json();
                 state.products = extractProducts(payload);
+                state.backendMode = 'full';
                 renderProducts();
                 setStatus(`נטענו ${state.products.length} מוצרים.`, 'success');
             } catch (err) {
                 console.error(err);
-                el.productsList.innerHTML = '<div class="text-center text-red-700 py-6 border border-red-200 rounded-xl bg-red-50">שגיאה בטעינת המוצרים. ודא ש-Google Script מחזיר JSON.</div>';
-                setStatus('לא ניתן לטעון מוצרים כרגע.', 'error');
+                state.backendMode = 'legacy_append_only';
+                setProductsError(
+                    'בסקריפט ששלחת קיימת רק הפונקציה doPost שמוסיפה שורה חדשה. כדי להציג/לערוך מוצרים צריך גם doGet להחזרת רשימה ועדכון לפי מזהה.',
+                    'נדרש: doGet() שמחזיר JSON של כל השורות + doPost() שתומך ב-action=create/update.'
+                );
+                setStatus('זוהה סקריפט במצב הוספה בלבד (append only). הוספה עובדת, טעינה/עריכה דורשות הרחבת הסקריפט.', 'info');
             }
         }
 
@@ -308,6 +324,10 @@
 
             try {
                 setLoading(true, state.editing ? 'שומר עדכונים...' : 'מעלה מוצר...');
+
+                if (state.editing && state.backendMode !== 'full') {
+                    throw new Error('השרת מוגדר כרגע להוספה בלבד (ללא doGet/doUpdate), לכן אי אפשר לשמור עריכה.');
+                }
 
                 const newUploadedImages = files.length ? await uploadImages(files) : [];
                 const finalImages = [...state.currentImageUrls, ...newUploadedImages];
