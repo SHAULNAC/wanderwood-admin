@@ -2,139 +2,282 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WanderWood Admin | ניהול קטלוג מתקדם</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Assistant', sans-serif; background: #f0ede9; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .admin-box { background: white; padding: 2.5rem; border-radius: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,0.1); width: 100%; max-width: 550px; border: 1px solid #e5e7eb; }
-        .loading-spinner { border: 3px solid #f3f3f3; border-top: 3px solid #bc986a; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-left: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        body {
+            font-family: 'Assistant', sans-serif;
+            background: #f0ede9;
+            min-height: 100vh;
+        }
+        .admin-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #bc986a;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #productsList img {
+            border-radius: 0.75rem;
+        }
     </style>
 </head>
-<body class="p-6">
-
-    <div class="admin-box">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-stone-800">WANDER<span class="text-[#bc986a]">WOOD</span></h1>
-            <p class="text-stone-500 mt-2 font-medium">ניהול קטלוג והעלאת תמונות מרובות</p>
-        </div>
-        
-        <form id="fullAdminForm" class="space-y-5">
-            <div>
-                <label class="block text-sm font-bold text-stone-700 mb-1">שם המוצר</label>
-                <input type="text" id="name" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a] transition-all" placeholder="למשל: סט קוביות אלון" required>
+<body class="p-4 md:p-8">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-6">
+        <section class="admin-box">
+            <div class="text-center mb-6">
+                <h1 class="text-3xl font-bold text-stone-800">WANDER<span class="text-[#bc986a]">WOOD</span></h1>
+                <p class="text-stone-500 mt-2 font-medium">ניהול מוצרים, עריכה ותמונות</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-bold text-stone-700 mb-1">מחיר (₪)</label>
-                    <input type="number" id="price" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a]" placeholder="350" required>
+            <form id="fullAdminForm" class="space-y-4">
+                <input type="hidden" id="editingOriginalId">
+                
+                <div class="flex items-center justify-between gap-3 bg-stone-50 p-3 rounded-xl border border-stone-200">
+                    <p id="formMode" class="font-bold text-stone-700">מצב: הוספת מוצר חדש</p>
+                    <button type="button" id="cancelEditBtn" class="hidden text-sm bg-stone-200 hover:bg-stone-300 px-3 py-1.5 rounded-lg font-bold">ביטול עריכה</button>
                 </div>
+
                 <div>
-                    <label class="block text-sm font-bold text-stone-700 mb-1">מזהה (ID)</label>
-                    <input type="text" id="id" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a]" placeholder="101">
+                    <label class="block text-sm font-bold text-stone-700 mb-1">שם המוצר</label>
+                    <input type="text" id="name" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a] transition-all" placeholder="למשל: סט קוביות אלון" required>
                 </div>
-            </div>
 
-            <div>
-                <label class="block text-sm font-bold text-stone-700 mb-1">תיאור המוצר</label>
-                <textarea id="description" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a]" rows="2" placeholder="ספר על המרקם, הגימור והשימוש..."></textarea>
-            </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-stone-700 mb-1">מחיר (₪)</label>
+                        <input type="number" id="price" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a]" placeholder="350" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-stone-700 mb-1">מזהה (ID)</label>
+                        <input type="text" id="id" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a]" placeholder="101" required>
+                    </div>
+                </div>
 
-            <div class="p-6 bg-stone-50 rounded-2xl border-2 border-dashed border-stone-300 text-center hover:border-[#bc986a] transition-all group">
-                <label class="block text-sm font-bold text-stone-700 mb-2 cursor-pointer">
-                    <span class="block text-2xl mb-1 group-hover:scale-110 transition-transform">📸</span>
-                    בחר תמונות מהמחשב
-                    <span class="block text-xs font-normal text-stone-400 mt-1">(ניתן לבחור כמה תמונות יחד)</span>
-                </label>
-                <input type="file" id="imageFiles" accept="image/*" multiple class="block w-full text-sm text-gray-500 file:bg-stone-800 file:text-white file:rounded-full file:px-4 file:py-2 file:border-0 cursor-pointer">
-            </div>
-            
-            <button type="submit" id="mainBtn" class="w-full bg-stone-800 text-white py-4 rounded-xl font-bold text-lg hover:bg-[#bc986a] transition-all shadow-lg active:scale-95 flex items-center justify-center">
-                <span id="btnText">העלה מוצר לאתר</span>
-            </button>
-        </form>
+                <div>
+                    <label class="block text-sm font-bold text-stone-700 mb-1">תיאור המוצר</label>
+                    <textarea id="description" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a]" rows="2" placeholder="ספר על המרקם, הגימור והשימוש..."></textarea>
+                </div>
 
-        <div id="statusMessage" class="mt-6 p-4 rounded-xl text-center hidden font-bold"></div>
+                <div>
+                    <label class="block text-sm font-bold text-stone-700 mb-2">תמונות נוכחיות</label>
+                    <div id="currentImages" class="grid grid-cols-3 gap-3"></div>
+                    <p id="noImagesText" class="text-xs text-stone-400 mt-1">אין תמונות למוצר זה.</p>
+                </div>
+
+                <div class="p-4 bg-stone-50 rounded-2xl border-2 border-dashed border-stone-300 text-center hover:border-[#bc986a] transition-all group relative">
+                    <label class="block text-sm font-bold text-stone-700 mb-2 cursor-pointer">
+                        <span class="block text-2xl mb-1 group-hover:scale-110 transition-transform">📸</span>
+                        הוסף תמונות חדשות
+                        <input type="file" id="imageFiles" accept="image/*" multiple class="absolute inset-0 opacity-0 cursor-pointer">
+                    </label>
+                </div>
+
+                <button type="submit" id="mainBtn" class="w-full bg-stone-800 text-white py-4 rounded-xl font-bold text-lg hover:bg-[#bc986a] transition-all shadow-lg active:scale-95 flex items-center justify-center">
+                    <span id="btnText">העלה מוצר לאתר</span>
+                </button>
+            </form>
+
+            <div id="statusMessage" class="mt-4 p-3 rounded-xl text-center hidden font-bold"></div>
+        </section>
+
+        <section class="admin-box">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-stone-800">כל המוצרים הקיימים</h2>
+                <button id="refreshProductsBtn" class="bg-stone-800 text-white px-4 py-2 rounded-lg font-bold hover:bg-[#bc986a]">רענון</button>
+            </div>
+            <div id="productsList" class="space-y-3 max-h-[65vh] overflow-auto pr-1">
+                <div class="text-center text-stone-500 py-6">טוען נתונים...</div>
+            </div>
+        </section>
     </div>
 
     <script>
-        // המפתחות שלך הוטמעו כאן
-        const IMGBB_API_KEY = '5d561102b019920681529a9226113eaf'; 
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXn32HtQ7M1zt4aSvMzUqykPCGUBDaMu24aU2-mqrbErawzBmi_xzy_15RlOzJ2sId/exec'; 
+        const IMGBB_API_KEY = '5d561102b019920681529a9226113eaf';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxL9QSOn5UNIJAa1FKZPbW1Sy0QjAq7h0A4mAJhOLaYTPi21Jq4rw9UWUGcprJMSWG/exec';
 
-        document.getElementById('fullAdminForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('mainBtn');
-            const btnText = document.getElementById('btnText');
-            const status = document.getElementById('statusMessage');
-            const files = document.getElementById('imageFiles').files;
+        const state = {
+            products: [],
+            currentImageUrls: [],
+            editing: false
+        };
 
-            if (files.length === 0) {
-                alert("נא לבחור לפחות תמונה אחת");
+        const el = {
+            form: document.getElementById('fullAdminForm'),
+            mainBtn: document.getElementById('mainBtn'),
+            btnText: document.getElementById('btnText'),
+            status: document.getElementById('statusMessage'),
+            productsList: document.getElementById('productsList'),
+            currentImages: document.getElementById('currentImages'),
+            noImagesText: document.getElementById('noImagesText'),
+            editingOriginalId: document.getElementById('editingOriginalId'),
+            cancelEditBtn: document.getElementById('cancelEditBtn'),
+            formMode: document.getElementById('formMode')
+        };
+
+        // הצגת תמונות נוכחיות של המוצר בטופס
+        function renderCurrentImages() {
+            el.currentImages.innerHTML = '';
+            if (state.currentImageUrls.length === 0) {
+                el.noImagesText.classList.remove('hidden');
+            } else {
+                el.noImagesText.classList.add('hidden');
+                state.currentImageUrls.forEach((url, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'relative border rounded-lg overflow-hidden h-20';
+                    item.innerHTML = `
+                        <img src="${url}" class="w-full h-full object-cover">
+                        <button type="button" onclick="removeImage(${index})" class="absolute top-0 left-0 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-br-lg">X</button>
+                    `;
+                    el.currentImages.appendChild(item);
+                });
+            }
+        }
+
+        window.removeImage = (index) => {
+            state.currentImageUrls.splice(index, 1);
+            renderCurrentImages();
+        };
+
+        // טעינת מוצרים מהגוגל שיטס
+        async function loadProducts() {
+            try {
+                el.productsList.innerHTML = '<div class="text-center text-stone-500 py-6">טוען מוצרים מהגיליון...</div>';
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=list`);
+                const result = await response.json();
+                
+                if (result.ok) {
+                    state.products = result.products;
+                    renderProductsList();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                el.productsList.innerHTML = `<div class="text-red-500 p-4 border rounded">שגיאה בטעינה: ${err.message}</div>`;
+            }
+        }
+
+        function renderProductsList() {
+            if (state.products.length === 0) {
+                el.productsList.innerHTML = '<div class="text-center text-stone-500 py-6">לא נמצאו מוצרים.</div>';
                 return;
             }
 
-            // עדכון כפתור למצב טעינה
-            btn.disabled = true;
-            status.classList.add('hidden');
-            
-            try {
-                let imageUrls = [];
-                
-                // שלב 1: העלאת כל התמונות אחת אחת
-                for (let i = 0; i < files.length; i++) {
-                    btnText.innerHTML = `<span class="loading-spinner"></span> מעלה תמונה ${i+1} מתוך ${files.length}...`;
-                    
-                    const formData = new FormData();
-                    formData.append('image', files[i]);
+            el.productsList.innerHTML = state.products.map(product => {
+                const imgUrl = product.image ? product.image.split(',')[0] : 'https://placehold.co/100x100?text=No+Image';
+                return `
+                    <div class="border rounded-xl p-3 flex gap-4 items-center bg-white shadow-sm">
+                        <img src="${imgUrl}" class="w-16 h-16 object-cover border">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-stone-800">${product.name || 'ללא שם'}</h3>
+                            <p class="text-sm text-stone-500">ID: ${product.id} | מחיר: ₪${product.price}</p>
+                        </div>
+                        <button onclick="fillEditForm('${product.id}')" class="bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#bc986a]">עריכה</button>
+                    </div>
+                `;
+            }).join('');
+        }
 
-                    const imgResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const imgResult = await imgResponse.json();
-                    
-                    if (imgResult.success) {
-                        imageUrls.push(imgResult.data.url);
-                    }
+        // מילוי הטופס לעריכה
+        window.fillEditForm = (id) => {
+            const product = state.products.find(p => String(p.id) === String(id));
+            if (!product) return;
+
+            state.editing = true;
+            el.editingOriginalId.value = product.id;
+            document.getElementById('name').value = product.name;
+            document.getElementById('price').value = product.price;
+            document.getElementById('description').value = product.description;
+            document.getElementById('id').value = product.id;
+            state.currentImageUrls = product.image ? product.image.split(',') : [];
+
+            el.formMode.innerText = `מצב: עריכת מוצר #${product.id}`;
+            el.cancelEditBtn.classList.remove('hidden');
+            el.btnText.innerText = "שמור עדכונים";
+            renderCurrentImages();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // שליחת הטופס (הוספה או עדכון)
+        el.form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            el.mainBtn.disabled = true;
+            el.btnText.innerHTML = `<span class="loading-spinner"></span> שולח נתונים...`;
+
+            try {
+                const files = document.getElementById('imageFiles').files;
+                const newUrls = [];
+
+                // העלאת תמונות חדשות ל-ImgBB אם יש כאלו
+                for (let file of files) {
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) newUrls.push(data.data.url);
                 }
 
-                // שלב 2: שליחה לגוגל שיטס
-                btnText.innerHTML = `<span class="loading-spinner"></span> מעדכן קטלוג...`;
-                
-                const productData = {
+                const finalImages = [...state.currentImageUrls, ...newUrls].join(',');
+
+                const payload = {
+                    action: state.editing ? 'update' : 'create',
+                    originalId: el.editingOriginalId.value,
                     name: document.getElementById('name').value,
                     price: document.getElementById('price').value,
                     description: document.getElementById('description').value,
-                    image: imageUrls.join(','), // כל הקישורים מופרדים בפסיק
+                    image: finalImages,
                     id: document.getElementById('id').value
                 };
 
-                // שליחה בפורמט JSON לגוגל
+                // שליחה לגוגל שיטס
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(productData)
+                    mode: 'no-cors', // שימוש ב-no-cors עבור Google Apps Script
+                    body: JSON.stringify(payload)
                 });
 
-                // הצלחה
-                status.innerText = '✅ המוצר נוסף בהצלחה! התמונות יתחלפו אוטומטית באתר.';
-                status.className = 'mt-6 p-4 rounded-xl text-center bg-green-100 text-green-800 font-bold block';
-                document.getElementById('fullAdminForm').reset();
+                // הודעת הצלחה
+                showStatus(state.editing ? "המוצר עודכן בהצלחה!" : "המוצר נוסף בהצלחה!", "success");
+                
+                // רענון העמוד לאחר המתנה קלה
+                setTimeout(() => location.reload(), 1500);
 
             } catch (err) {
-                console.error(err);
-                status.innerText = '❌ קרתה שגיאה: ' + err.message;
-                status.className = 'mt-6 p-4 rounded-xl text-center bg-red-100 text-red-800 font-bold block';
-            } finally {
-                btn.disabled = false;
-                btnText.innerText = 'העלה מוצר לאתר';
+                showStatus("שגיאה: " + err.message, "error");
+                el.mainBtn.disabled = false;
+                el.btnText.innerText = state.editing ? "שמור עדכונים" : "העלה מוצר לאתר";
             }
         });
+
+        function showStatus(msg, type) {
+            el.status.innerText = msg;
+            el.status.className = `mt-4 p-3 rounded-xl text-center font-bold block ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+            el.status.classList.remove('hidden');
+        }
+
+        el.cancelEditBtn.onclick = () => location.reload();
+        el.refreshProductsBtn.onclick = loadProducts;
+
+        // טעינה ראשונית
+        loadProducts();
     </script>
 </body>
 </html>
