@@ -118,6 +118,7 @@
             currentImageUrls: [],
             editing: false
         };
+        const COLUMN_KEYS = ['name', 'price', 'description', 'image', 'id'];
 
         const el = {
             form: document.getElementById('fullAdminForm'),
@@ -125,6 +126,7 @@
             btnText: document.getElementById('btnText'),
             status: document.getElementById('statusMessage'),
             productsList: document.getElementById('productsList'),
+            refreshProductsBtn: document.getElementById('refreshProductsBtn'),
             currentImages: document.getElementById('currentImages'),
             noImagesText: document.getElementById('noImagesText'),
             editingOriginalId: document.getElementById('editingOriginalId'),
@@ -156,6 +158,40 @@
             renderCurrentImages();
         };
 
+        // נרמול מוצרים לתאימות לפריסת עמודות קבועה:
+        // name, price, description, image, id
+        function normalizeProduct(rawProduct) {
+            if (!rawProduct) return null;
+
+            // במקרה נדיר שמגיע מערך ישיר
+            if (Array.isArray(rawProduct)) {
+                const fromArray = {
+                    name: rawProduct[0] ?? '',
+                    price: rawProduct[1] ?? '',
+                    description: rawProduct[2] ?? '',
+                    image: rawProduct[3] ?? '',
+                    id: rawProduct[4] ?? ''
+                };
+                return fromArray;
+            }
+
+            const normalizedInput = {};
+            Object.keys(rawProduct).forEach((key) => {
+                const normalizedKey = String(key).trim().toLowerCase();
+                normalizedInput[normalizedKey] = rawProduct[key];
+            });
+
+            const fromObject = {
+                name: normalizedInput.name ?? normalizedInput.col_0 ?? '',
+                price: normalizedInput.price ?? normalizedInput.col_1 ?? '',
+                description: normalizedInput.description ?? normalizedInput.col_2 ?? '',
+                image: normalizedInput.image ?? normalizedInput.col_3 ?? '',
+                id: normalizedInput.id ?? normalizedInput.col_4 ?? ''
+            };
+
+            return fromObject;
+        }
+
         // טעינת מוצרים מהגוגל שיטס
         async function loadProducts() {
             try {
@@ -164,7 +200,9 @@
                 const result = await response.json();
                 
                 if (result.ok) {
-                    state.products = result.products;
+                    state.products = (result.products || [])
+                        .map(normalizeProduct)
+                        .filter((product) => product && COLUMN_KEYS.some((key) => String(product[key] ?? '').trim() !== ''));
                     renderProductsList();
                 } else {
                     throw new Error(result.error);
