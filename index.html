@@ -7,36 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Assistant', sans-serif;
-            background: #f0ede9;
-            min-height: 100vh;
-        }
-        .admin-box {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-        }
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #bc986a;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 10px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        #productsList img {
-            border-radius: 0.75rem;
-        }
+        body { font-family: 'Assistant', sans-serif; background: #f0ede9; min-height: 100vh; }
+        .admin-box { background: white; padding: 1.5rem; border-radius: 1.5rem; box-shadow: 0 20px 50px rgba(0,0,0,.1); border: 1px solid #e5e7eb; }
+        .loading-spinner { border:3px solid #f3f3f3; border-top:3px solid #bc986a; border-radius:50%; width:20px; height:20px; animation:spin 1s linear infinite; display:inline-block; vertical-align:middle; margin-left:10px; }
+        @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+        #productsList img { border-radius: 0.75rem; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -49,17 +24,14 @@
 
             <form id="fullAdminForm" class="space-y-4">
                 <input type="hidden" id="editingOriginalId">
-                
                 <div class="flex items-center justify-between gap-3 bg-stone-50 p-3 rounded-xl border border-stone-200">
                     <p id="formMode" class="font-bold text-stone-700">מצב: הוספת מוצר חדש</p>
                     <button type="button" id="cancelEditBtn" class="hidden text-sm bg-stone-200 hover:bg-stone-300 px-3 py-1.5 rounded-lg font-bold">ביטול עריכה</button>
                 </div>
-
                 <div>
                     <label class="block text-sm font-bold text-stone-700 mb-1">שם המוצר</label>
                     <input type="text" id="name" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a] transition-all" placeholder="למשל: סט קוביות אלון" required>
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-bold text-stone-700 mb-1">מחיר (₪)</label>
@@ -70,18 +42,15 @@
                         <input type="text" id="id" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a]" placeholder="101" required>
                     </div>
                 </div>
-
                 <div>
                     <label class="block text-sm font-bold text-stone-700 mb-1">תיאור המוצר</label>
                     <textarea id="description" class="w-full p-3 border border-stone-200 rounded-xl outline-none focus:border-[#bc986a]" rows="2" placeholder="ספר על המרקם, הגימור והשימוש..."></textarea>
                 </div>
-
                 <div>
                     <label class="block text-sm font-bold text-stone-700 mb-2">תמונות נוכחיות</label>
                     <div id="currentImages" class="grid grid-cols-3 gap-3"></div>
                     <p id="noImagesText" class="text-xs text-stone-400 mt-1">אין תמונות למוצר זה.</p>
                 </div>
-
                 <div class="p-4 bg-stone-50 rounded-2xl border-2 border-dashed border-stone-300 text-center hover:border-[#bc986a] transition-all group relative">
                     <label class="block text-sm font-bold text-stone-700 mb-2 cursor-pointer">
                         <span class="block text-2xl mb-1 group-hover:scale-110 transition-transform">📸</span>
@@ -89,7 +58,6 @@
                         <input type="file" id="imageFiles" accept="image/*" multiple class="absolute inset-0 opacity-0 cursor-pointer">
                     </label>
                 </div>
-
                 <button type="submit" id="mainBtn" class="w-full bg-stone-800 text-white py-4 rounded-xl font-bold text-lg hover:bg-[#bc986a] transition-all shadow-lg active:scale-95 flex items-center justify-center">
                     <span id="btnText">העלה מוצר לאתר</span>
                 </button>
@@ -99,6 +67,16 @@
         </section>
 
         <section class="admin-box">
+            <div class="mb-4 rounded-xl bg-stone-50 border border-stone-200 p-3 space-y-2">
+                <h3 class="font-bold text-stone-800">סנכרון מוצרים ל-GitHub Action</h3>
+                <p class="text-sm text-stone-600">אתר למכירת אביזרי צילום מעץ בהתאמה אישית.</p>
+                <div class="grid md:grid-cols-2 gap-2">
+                    <input id="ghOwner" type="text" placeholder="OWNER" class="p-2 border rounded-lg">
+                    <input id="ghRepo" type="text" placeholder="REPO" class="p-2 border rounded-lg">
+                    <input id="ghToken" type="password" placeholder="GITHUB_TOKEN (Classic PAT)" class="p-2 border rounded-lg md:col-span-2">
+                </div>
+                <div id="syncLinks" class="text-xs text-stone-500 space-y-1"></div>
+            </div>
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-2xl font-bold text-stone-800">כל המוצרים הקיימים</h2>
                 <button id="refreshProductsBtn" class="bg-stone-800 text-white px-4 py-2 rounded-lg font-bold hover:bg-[#bc986a]">רענון</button>
@@ -108,176 +86,27 @@
             </div>
         </section>
     </div>
-
-    <script>
-        const IMGBB_API_KEY = '5d561102b019920681529a9226113eaf';
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxL9QSOn5UNIJAa1FKZPbW1Sy0QjAq7h0A4mAJhOLaYTPi21Jq4rw9UWUGcprJMSWG/exec';
-
-        const state = {
-            products: [],
-            currentImageUrls: [],
-            editing: false
-        };
-
-        const el = {
-            form: document.getElementById('fullAdminForm'),
-            mainBtn: document.getElementById('mainBtn'),
-            btnText: document.getElementById('btnText'),
-            status: document.getElementById('statusMessage'),
-            productsList: document.getElementById('productsList'),
-            currentImages: document.getElementById('currentImages'),
-            noImagesText: document.getElementById('noImagesText'),
-            editingOriginalId: document.getElementById('editingOriginalId'),
-            cancelEditBtn: document.getElementById('cancelEditBtn'),
-            formMode: document.getElementById('formMode')
-        };
-
-        // הצגת תמונות נוכחיות של המוצר בטופס
-        function renderCurrentImages() {
-            el.currentImages.innerHTML = '';
-            if (state.currentImageUrls.length === 0) {
-                el.noImagesText.classList.remove('hidden');
-            } else {
-                el.noImagesText.classList.add('hidden');
-                state.currentImageUrls.forEach((url, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'relative border rounded-lg overflow-hidden h-20';
-                    item.innerHTML = `
-                        <img src="${url}" class="w-full h-full object-cover">
-                        <button type="button" onclick="removeImage(${index})" class="absolute top-0 left-0 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-br-lg">X</button>
-                    `;
-                    el.currentImages.appendChild(item);
-                });
-            }
-        }
-
-        window.removeImage = (index) => {
-            state.currentImageUrls.splice(index, 1);
-            renderCurrentImages();
-        };
-
-        // טעינת מוצרים מהגוגל שיטס
-        async function loadProducts() {
-            try {
-                el.productsList.innerHTML = '<div class="text-center text-stone-500 py-6">טוען מוצרים מהגיליון...</div>';
-                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=list`);
-                const result = await response.json();
-                
-                if (result.ok) {
-                    state.products = result.products;
-                    renderProductsList();
-                } else {
-                    throw new Error(result.error);
-                }
-            } catch (err) {
-                el.productsList.innerHTML = `<div class="text-red-500 p-4 border rounded">שגיאה בטעינה: ${err.message}</div>`;
-            }
-        }
-
-        function renderProductsList() {
-            if (state.products.length === 0) {
-                el.productsList.innerHTML = '<div class="text-center text-stone-500 py-6">לא נמצאו מוצרים.</div>';
-                return;
-            }
-
-            el.productsList.innerHTML = state.products.map(product => {
-                const imgUrl = product.image ? product.image.split(',')[0] : 'https://placehold.co/100x100?text=No+Image';
-                return `
-                    <div class="border rounded-xl p-3 flex gap-4 items-center bg-white shadow-sm">
-                        <img src="${imgUrl}" class="w-16 h-16 object-cover border">
-                        <div class="flex-1">
-                            <h3 class="font-bold text-stone-800">${product.name || 'ללא שם'}</h3>
-                            <p class="text-sm text-stone-500">ID: ${product.id} | מחיר: ₪${product.price}</p>
-                        </div>
-                        <button onclick="fillEditForm('${product.id}')" class="bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#bc986a]">עריכה</button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // מילוי הטופס לעריכה
-        window.fillEditForm = (id) => {
-            const product = state.products.find(p => String(p.id) === String(id));
-            if (!product) return;
-
-            state.editing = true;
-            el.editingOriginalId.value = product.id;
-            document.getElementById('name').value = product.name;
-            document.getElementById('price').value = product.price;
-            document.getElementById('description').value = product.description;
-            document.getElementById('id').value = product.id;
-            state.currentImageUrls = product.image ? product.image.split(',') : [];
-
-            el.formMode.innerText = `מצב: עריכת מוצר #${product.id}`;
-            el.cancelEditBtn.classList.remove('hidden');
-            el.btnText.innerText = "שמור עדכונים";
-            renderCurrentImages();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        // שליחת הטופס (הוספה או עדכון)
-        el.form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            el.mainBtn.disabled = true;
-            el.btnText.innerHTML = `<span class="loading-spinner"></span> שולח נתונים...`;
-
-            try {
-                const files = document.getElementById('imageFiles').files;
-                const newUrls = [];
-
-                // העלאת תמונות חדשות ל-ImgBB אם יש כאלו
-                for (let file of files) {
-                    const formData = new FormData();
-                    formData.append('image', file);
-                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
-                    const data = await res.json();
-                    if (data.success) newUrls.push(data.data.url);
-                }
-
-                const finalImages = [...state.currentImageUrls, ...newUrls].join(',');
-
-                const payload = {
-                    action: state.editing ? 'update' : 'create',
-                    originalId: el.editingOriginalId.value,
-                    name: document.getElementById('name').value,
-                    price: document.getElementById('price').value,
-                    description: document.getElementById('description').value,
-                    image: finalImages,
-                    id: document.getElementById('id').value
-                };
-
-                // שליחה לגוגל שיטס
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // שימוש ב-no-cors עבור Google Apps Script
-                    body: JSON.stringify(payload)
-                });
-
-                // הודעת הצלחה
-                showStatus(state.editing ? "המוצר עודכן בהצלחה!" : "המוצר נוסף בהצלחה!", "success");
-                
-                // רענון העמוד לאחר המתנה קלה
-                setTimeout(() => location.reload(), 1500);
-
-            } catch (err) {
-                showStatus("שגיאה: " + err.message, "error");
-                el.mainBtn.disabled = false;
-                el.btnText.innerText = state.editing ? "שמור עדכונים" : "העלה מוצר לאתר";
-            }
-        });
-
-        function showStatus(msg, type) {
-            el.status.innerText = msg;
-            el.status.className = `mt-4 p-3 rounded-xl text-center font-bold block ${type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
-            el.status.classList.remove('hidden');
-        }
-
-        el.cancelEditBtn.onclick = () => location.reload();
-        el.refreshProductsBtn.onclick = loadProducts;
-
-        // טעינה ראשונית
-        loadProducts();
-    </script>
+<script>
+const IMGBB_API_KEY='5d561102b019920681529a9226113eaf';
+const GOOGLE_SCRIPT_URL='https://script.google.com/macros/s/AKfycbwxL9QSOn5UNIJAa1FKZPbW1Sy0QjAq7h0A4mAJhOLaYTPi21Jq4rw9UWUGcprJMSWG/exec';
+const state={products:[],currentImageUrls:[],editing:false};
+const COLUMN_KEYS=['name','price','description','image','id'];
+const el={form:document.getElementById('fullAdminForm'),mainBtn:document.getElementById('mainBtn'),btnText:document.getElementById('btnText'),status:document.getElementById('statusMessage'),productsList:document.getElementById('productsList'),refreshProductsBtn:document.getElementById('refreshProductsBtn'),currentImages:document.getElementById('currentImages'),noImagesText:document.getElementById('noImagesText'),editingOriginalId:document.getElementById('editingOriginalId'),cancelEditBtn:document.getElementById('cancelEditBtn'),formMode:document.getElementById('formMode'),ghOwner:document.getElementById('ghOwner'),ghRepo:document.getElementById('ghRepo'),ghToken:document.getElementById('ghToken'),syncLinks:document.getElementById('syncLinks')};
+function renderCurrentImages(){el.currentImages.innerHTML='';if(state.currentImageUrls.length===0){el.noImagesText.classList.remove('hidden');}else{el.noImagesText.classList.add('hidden');state.currentImageUrls.forEach((url,index)=>{const item=document.createElement('div');item.className='relative border rounded-lg overflow-hidden h-20';item.innerHTML=`<img src="${url}" class="w-full h-full object-cover"><button type="button" onclick="removeImage(${index})" class="absolute top-0 left-0 bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-br-lg">X</button>`;el.currentImages.appendChild(item);});}}
+window.removeImage=(index)=>{state.currentImageUrls.splice(index,1);renderCurrentImages();};
+function normalizeProduct(rawProduct){if(!rawProduct)return null;if(Array.isArray(rawProduct)){return {name:rawProduct[0]??'',price:rawProduct[1]??'',description:rawProduct[2]??'',image:rawProduct[3]??'',id:rawProduct[4]??''};}const n={};Object.keys(rawProduct).forEach((key)=>{n[String(key).trim().toLowerCase()]=rawProduct[key];});return {name:n.name??n.col_0??'',price:n.price??n.col_1??'',description:n.description??n.col_2??'',image:n.image??n.col_3??'',id:n.id??n.col_4??''};}
+async function loadProducts(){try{el.productsList.innerHTML='<div class="text-center text-stone-500 py-6">טוען מוצרים מהגיליון...</div>';const response=await fetch(`${GOOGLE_SCRIPT_URL}?action=list`);const result=await response.json();if(result.ok){state.products=(result.products||[]).map(normalizeProduct).filter((product)=>product&&COLUMN_KEYS.some((key)=>String(product[key]??'').trim()!==''));renderProductsList();}else{throw new Error(result.error);}}catch(err){el.productsList.innerHTML=`<div class="text-red-500 p-4 border rounded">שגיאה בטעינה: ${err.message}</div>`;}}
+function renderProductsList(){if(state.products.length===0){el.productsList.innerHTML='<div class="text-center text-stone-500 py-6">לא נמצאו מוצרים.</div>';return;}el.productsList.innerHTML=state.products.map(product=>{const imgUrl=product.image?product.image.split(',')[0]:'https://placehold.co/100x100?text=No+Image';return `<div class="border rounded-xl p-3 flex gap-4 items-center bg-white shadow-sm"><img src="${imgUrl}" class="w-16 h-16 object-cover border"><div class="flex-1"><h3 class="font-bold text-stone-800">${product.name||'ללא שם'}</h3><p class="text-sm text-stone-500">ID: ${product.id} | מחיר: ₪${product.price}</p></div><div class="flex gap-2"><button onclick="fillEditForm('${product.id}')" class="bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#bc986a]">עריכה</button><button onclick="deleteProduct('${product.id}')" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700">מחיקה</button></div></div>`;}).join('');}
+window.fillEditForm=(id)=>{const product=state.products.find(p=>String(p.id)===String(id));if(!product)return;state.editing=true;el.editingOriginalId.value=product.id;document.getElementById('name').value=product.name;document.getElementById('price').value=product.price;document.getElementById('description').value=product.description;document.getElementById('id').value=product.id;state.currentImageUrls=product.image?product.image.split(','):[];el.formMode.innerText=`מצב: עריכת מוצר #${product.id}`;el.cancelEditBtn.classList.remove('hidden');el.btnText.innerText='שמור עדכונים';renderCurrentImages();window.scrollTo({top:0,behavior:'smooth'});};
+function renderSyncLinks(){const owner=el.ghOwner.value.trim()||'<OWNER>';const repo=el.ghRepo.value.trim()||'<REPO>';el.syncLinks.innerHTML=`<p>Actions: <a class="underline" target="_blank" href="https://github.com/${owner}/${repo}/actions">https://github.com/${owner}/${repo}/actions</a></p><p>Workflow: <a class="underline" target="_blank" href="https://github.com/${owner}/${repo}/actions/workflows/sync-products.yml">https://github.com/${owner}/${repo}/actions/workflows/sync-products.yml</a></p><p>PAT (Classic): <a class="underline" target="_blank" href="https://github.com/settings/tokens/new">https://github.com/settings/tokens/new</a></p><p>Webhook Endpoint: https://api.github.com/repos/${owner}/${repo}/dispatches (POST)</p>`;}
+function saveSyncConfig(){localStorage.setItem('ww_sync_owner',el.ghOwner.value.trim());localStorage.setItem('ww_sync_repo',el.ghRepo.value.trim());localStorage.setItem('ww_sync_token',el.ghToken.value.trim());renderSyncLinks();}
+function loadSyncConfig(){el.ghOwner.value=localStorage.getItem('ww_sync_owner')||'';el.ghRepo.value=localStorage.getItem('ww_sync_repo')||'';el.ghToken.value=localStorage.getItem('ww_sync_token')||'';renderSyncLinks();}
+async function triggerProductsSyncWebhook(){const owner=el.ghOwner.value.trim();const repo=el.ghRepo.value.trim();const token=el.ghToken.value.trim();if(!owner||!repo||!token){showStatus('השינוי נשמר, אך לא נשלח Webhook (חסרים OWNER/REPO/TOKEN).','error');return;}const endpoint=`https://api.github.com/repos/${owner}/${repo}/dispatches`;const res=await fetch(endpoint,{method:'POST',headers:{'Accept':'application/vnd.github+json','Authorization':`Bearer ${token}`,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},body:JSON.stringify({event_type:'products_sync',client_payload:{source:'admin-products'}})});if(!res.ok){throw new Error(`Webhook failed: ${res.status}`);}}
+window.deleteProduct=async(id)=>{if(!confirm(`למחוק את מוצר #${id}?`)) return;try{showStatus('מוחק מוצר...', 'success');await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify({action:'delete',id})});try{await triggerProductsSyncWebhook();}catch(err){console.error(err);}showStatus('המוצר נמחק בהצלחה!', 'success');setTimeout(()=>location.reload(),1200);}catch(err){showStatus('שגיאה במחיקה: '+err.message,'error');}};
+el.form.addEventListener('submit',async(e)=>{e.preventDefault();el.mainBtn.disabled=true;el.btnText.innerHTML=`<span class="loading-spinner"></span> שולח נתונים...`;try{const files=document.getElementById('imageFiles').files;const newUrls=[];for(let file of files){const formData=new FormData();formData.append('image',file);const res=await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,{method:'POST',body:formData});const data=await res.json();if(data.success)newUrls.push(data.data.url);}const finalImages=[...state.currentImageUrls,...newUrls].join(',');const payload={action:state.editing?'update':'create',originalId:el.editingOriginalId.value,name:document.getElementById('name').value,price:document.getElementById('price').value,description:document.getElementById('description').value,image:finalImages,id:document.getElementById('id').value};await fetch(GOOGLE_SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)});try{await triggerProductsSyncWebhook();}catch(err){console.error(err);}showStatus(state.editing?'המוצר עודכן בהצלחה!':'המוצר נוסף בהצלחה!','success');setTimeout(()=>location.reload(),1500);}catch(err){showStatus('שגיאה: '+err.message,'error');el.mainBtn.disabled=false;el.btnText.innerText=state.editing?'שמור עדכונים':'העלה מוצר לאתר';}});
+function showStatus(msg,type){el.status.innerText=msg;el.status.className=`mt-4 p-3 rounded-xl text-center font-bold block ${type==='success'?'bg-green-100 text-green-800':'bg-red-100 text-red-800'}`;el.status.classList.remove('hidden');}
+el.cancelEditBtn.onclick=()=>location.reload();el.refreshProductsBtn.onclick=loadProducts;['input','change'].forEach((evt)=>{el.ghOwner.addEventListener(evt,saveSyncConfig);el.ghRepo.addEventListener(evt,saveSyncConfig);el.ghToken.addEventListener(evt,saveSyncConfig);});
+loadSyncConfig();loadProducts();
+</script>
 </body>
 </html>
